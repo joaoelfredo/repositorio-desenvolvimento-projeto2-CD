@@ -64,12 +64,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Execute os notebooks
-
-Abra o projeto no VS Code pela pasta raiz e execute os arquivos dentro de `notebooks/`.
-
-> Certifique-se de selecionar o Python local como Kernel no canto superior direito do notebook.
-
 ### Configuração do Kernel no VS Code (Importante)
 Após instalar as dependências no venv, você precisa garantir que o Jupyter Notebook está usando o ambiente correto:
 
