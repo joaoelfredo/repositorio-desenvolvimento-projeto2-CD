@@ -1,0 +1,175 @@
+Análise Completa de Todas as Colunas
+
+MSSubClass
+Armazenada como número inteiro (20, 30, 60, 90...), mas é um código que identifica o tipo e a época de construção do imóvel. O valor 60 significa "2 andares, construção a partir de 1946", e o 30 significa "1 andar, construção até 1945". Somar ou ordenar esses valores não faz sentido algum. O modelo não pode inferir que 60 vale o dobro de 30. Deve ser convertida para One-Hot Encoding.
+
+MSZoning
+Texto que indica a classificação de zoneamento do imóvel — residencial de baixa densidade (RL), residencial de média densidade (RM), comercial (C), industrial (I), etc. Não existe ordem entre as categorias. Uma zona comercial não é "melhor" que uma residencial, são apenas tipos diferentes. Precisa de One-Hot Encoding. Vale observar que a maioria esmagadora dos imóveis é RL, o que faz sentido já que o dataset trata de casas residenciais.
+
+LotFrontage
+Numérica contínua. Representa a metragem linear de rua que faz fronteira com o lote. Tem 18.6% de valores nulos que precisam de imputação — usamos a mediana do bairro porque lotes no mesmo bairro tendem a ter dimensões parecidas. Tem correlação moderada com o preço. Nenhuma transformação de tipo necessária, mas pode precisar de log por assimetria.
+
+LotArea
+Numérica contínua. Área total do lote em pés quadrados. Tem assimetria muito alta (acima de 11) porque a maioria dos lotes é relativamente pequena, mas alguns são enormes. Precisa de transformação log1p. Correlação moderada com o preço.
+
+Street
+Texto com apenas 2 categorias: Pave (pavimentada) e Grvl (cascalho). Quase todas as casas têm rua pavimentada, então essa coluna tem variância praticamente zero e provavelmente não vai contribuir muito para o modelo. Tecnicamente precisa de One-Hot
+
+Alley
+Texto indicando o tipo de acesso pelo beco — Pave, Grvl ou None (sem acesso por beco). A grande maioria (93.7%) é None. Coluna com baixa variância. Precisa de One-Hot Encoding, mas o impacto no modelo provavelmente será pequeno.
+
+LotShape
+Texto descrevendo o formato do lote: Reg (regular), IR1 (levemente irregular), IR2 (moderadamente irregular), IR3 (muito irregular). Existe aqui uma certa gradação de irregularidade, mas ela não necessariamente impacta o preço de forma linear. Pode-se argumentar tanto por ordinal quanto por One-Hot. A escolha mais segura é One-Hot.
+
+LandContour
+Texto descrevendo o relevo do terreno: Lvl (plano), Bnk (aclive brusco da rua), HLS (inclinação lateral), Low (depressão). São tipos distintos sem hierarquia clara entre si. One-Hot Encoding.
+
+Utilities
+Texto indicando as utilidades disponíveis: AllPub (todas), NoSewr (sem esgoto), NoSeWa (sem esgoto e água), ELO (só eletricidade). Praticamente todas as casas do dataset são AllPub, então essa coluna tem variância quase zero e pode ser removida sem perda.
+
+LotConfig
+Texto sobre a configuração do lote: Inside (lote interno), Corner (esquina), CulDSac (cul-de-sac), FR2 (frente em 2 lados), FR3 (frente em 3 lados). Sem hierarquia. One-Hot Encoding.
+
+LandSlope
+Texto sobre a inclinação do terreno: Gtl (suave), Mod (moderada), Sev (severa). Existe uma ordem lógica aqui — a inclinação vai de suave a severa — mas o impacto no preço não é necessariamente linear. Pode ser tratada como ordinal simples (0, 1, 2) ou One-Hot. Ambos funcionam.
+
+Neighborhood
+Texto com 25 bairros distintos de Ames. Como você viu na análise, o bairro tem impacto enorme no preço — diferença de até 3x entre o mais caro e o mais barato. Sem ordem entre os bairros. Precisa de One-Hot Encoding. Por ter 25 categorias, vai gerar 25 novas colunas binárias, o que é aceitável.
+
+Condition1 e Condition2
+Texto descrevendo a proximidade do imóvel a condições especiais: Normal, próximo a ferrovia, próximo a parque, próximo a rua arterial, etc. Condition2 é usada quando há mais de uma condição. A grande maioria é Normal. Sem hierarquia. One-Hot Encoding em ambas.
+
+BldgType
+Texto com o tipo de edificação: unifamiliar (1Fam), duplex (Duplx), geminado ponta (TwnhsE), geminado meio (TwnhsI), conversão bifamiliar (2FmCon). Sem ordem. One-Hot Encoding.
+
+HouseStyle
+Texto com o estilo arquitetônico: 1 andar, 1.5 andares (com ou sem acabamento no 2º), 2 andares, split level, etc. Sem hierarquia clara entre os estilos. One-Hot Encoding.
+
+OverallQual
+Numérica inteira de 1 a 10 representando a qualidade geral dos materiais e acabamentos. Esta é a variável mais correlacionada com o preço (0.79). Já é numérica e tem ordem real — 10 é genuinamente melhor que 5. Não precisa de transformação de tipo. Manter como está.
+
+OverallCond
+Numérica inteira de 1 a 10 representando a condição geral do imóvel. Mesma lógica do OverallQual. Já está em escala ordinal numérica. Manter como está.
+
+YearBuilt
+Numérica inteira com o ano de construção original. Tem correlação de 0.52 com o preço — casas mais novas valem mais. Em vez de usar o ano bruto, é mais informativo criar a feature house_age (ano de venda menos ano de construção), que captura diretamente o envelhecimento. O ano bruto pode ser mantido ou substituído pela feature derivada.
+
+YearRemodAdd
+Numérica inteira com o ano da última reforma. Se igual ao YearBuilt, a casa nunca foi reformada. Mesma lógica do YearBuilt — mais útil como years_since_remod ou como flag binária was_remodeled. Manter ou substituir pela feature derivada.
+
+RoofStyle
+Texto com o tipo de telhado: plano, duas águas, quatro águas, mansarda, etc. Sem hierarquia. One-Hot Encoding.
+
+RoofMatl
+Texto com o material do telhado: telha composta (padrão), madeira, metal, membrana, etc. Quase todas as casas usam CompShg (telha composta padrão), então a variância é muito baixa. One-Hot Encoding, mas com baixo impacto esperado.
+
+Exterior1st e Exterior2nd
+Texto com o material do revestimento externo da casa. Exterior2nd é usado quando há mais de um material. Têm bastante variedade (17 categorias cada). Sem hierarquia. One-Hot Encoding em ambas.
+
+MasVnrType
+Texto com o tipo de revestimento de alvenaria: tijolo face, pedra, bloco, nenhum. Tinha 58.5% de nulos que foram preenchidos com None. Sem hierarquia. One-Hot Encoding.
+
+MasVnrArea
+Numérica contínua com a área do revestimento de alvenaria em pés quadrados. Os nulos foram preenchidos com 0 (sem revestimento = 0 m²). Alta assimetria por muitos zeros. Precisa de log1p.
+
+ExterQual e ExterCond
+Texto com a qualidade e condição do material externo: Ex, Gd, TA, Fa, Po. Têm ordem clara — Excelente é melhor que Bom, que é melhor que Médio. Encoding ordinal: Ex=5, Gd=4, TA=3, Fa=2, Po=1.
+
+Foundation
+Texto com o tipo de fundação: concreto armado (PConc), bloco de concreto (CBlock), tijolo (BrkTil), laje (Slab), pedra (Stone), madeira (Wood). Sem hierarquia entre os tipos. One-Hot Encoding.
+
+BsmtQual, BsmtCond, BsmtExposure, BsmtFinType1, BsmtFinType2
+Todas descrevem o porão. BsmtQual avalia a altura (Ex = acima de 100 polegadas, até Po = abaixo de 70). BsmtCond avalia a condição geral. BsmtExposure avalia a exposição à luz (Gd > Av > Mn > No). BsmtFinType1 e 2 avaliam a qualidade do acabamento (GLQ > ALQ > BLQ > Rec > LwQ > Unf). Todas têm ordem lógica e foram tratadas com encoding ordinal. NaN em todas significa ausência de porão, preenchido com None/0 antes do encoding.
+
+BsmtFinSF1, BsmtFinSF2, BsmtUnfSF, TotalBsmtSF
+Numéricas contínuas com as áreas em pés quadrados das diferentes seções do porão. Nulos preenchidos com 0. TotalBsmtSF tem correlação de 0.60 com o preço. Assimetria moderada a alta — candidatas a log1p.
+
+Heating
+Texto com o tipo de aquecimento: gás forçado (GasA, padrão), água quente a gás, forno de chão, etc. Quase todas as casas usam GasA. Sem hierarquia. One-Hot Encoding, mas com variância muito baixa.
+
+HeatingQC
+Texto com a qualidade do sistema de aquecimento: Ex, Gd, TA, Fa, Po. Tem ordem lógica. Encoding ordinal.
+
+CentralAir
+Texto binário: Y (tem ar central) ou N (não tem). Tem impacto no preço. One-Hot Encoding ou simplesmente mapear para 1 e 0.
+
+Electrical
+Texto com o tipo de sistema elétrico: disjuntores padrão (SBrkr, presente em ~90% das casas), caixas de fusível antigas, etc. Tinha 1 nulo preenchido com a moda. Sem hierarquia técnica clara para o modelo. One-Hot Encoding.
+
+1stFlrSF e 2ndFlrSF
+Numéricas contínuas com a área do primeiro e segundo andar em pés quadrados. 1stFlrSF tem correlação de 0.59 com o preço. 2ndFlrSF é zero para casas de 1 andar. Juntas com TotalBsmtSF formam a base da feature total_sf que criamos. Assimetria moderada.
+
+LowQualFinSF
+Numérica com a área de acabamento de baixa qualidade. 98.2% dos valores são zero. Baixíssima variância. Candidata forte a remoção.
+
+GrLivArea
+Numérica contínua com a área habitável acima do solo. Segunda maior correlação com o preço (0.70). Uma das variáveis mais importantes do modelo. Foi usada para identificar os 2 outliers removidos. Manter como está, com possível log1p.
+
+BsmtFullBath e BsmtHalfBath
+Numéricas inteiras com o número de banheiros no porão. BsmtHalfBath tem 94.3% de zeros. Nulos preenchidos com 0. Foram incorporadas na feature total_bathrooms.
+
+FullBath e HalfBath
+Numéricas inteiras com banheiros completos e lavabos acima do solo. FullBath tem correlação de 0.55 com o preço. Incorporadas em total_bathrooms.
+
+BedroomAbvGr
+Numérica inteira com o número de quartos acima do solo. Correlação moderada com o preço. Manter como está.
+
+KitchenAbvGr
+Numérica inteira com o número de cozinhas acima do solo. Quase todas as casas têm exatamente 1. Variância muito baixa. Baixo impacto esperado.
+
+KitchenQual
+Texto com a qualidade da cozinha: Ex, Gd, TA, Fa, Po. Tem ordem lógica e impacto relevante no preço. Encoding ordinal.
+
+TotRmsAbvGrd
+Numérica inteira com o total de cômodos acima do solo, excluindo banheiros. Correlação de 0.52 com o preço. Alta colinearidade com GrLivArea — casas maiores têm mais cômodos. Manter, mas ter consciência da redundância.
+
+Functional
+Texto com a funcionalidade da casa: Typ (típica), até Sal (apenas salvamento). Tem ordem clara de degradação. Encoding ordinal: Typ=7, Min1=6, Min2=5, Mod=4, Maj1=3, Maj2=2, Sev=1, Sal=0.
+
+Fireplaces
+Numérica inteira com o número de lareiras. Correlação moderada com o preço. Usado para criar a flag has_fireplace. Manter como está.
+
+FireplaceQu
+Texto com a qualidade da lareira: Ex, Gd, TA, Fa, Po, None. 46.8% de nulos preenchidos com None (sem lareira). Encoding ordinal.
+
+GarageType
+Texto com o tipo de garagem: anexa à casa (Attchd), separada (Detchd), embutida (BuiltIn), no porão (Basment), etc. Nulos preenchidos com None. Sem hierarquia entre os tipos. One-Hot Encoding.
+
+GarageYrBlt
+Numérica com o ano de construção da garagem. Muito correlacionada com YearBuilt. Nulos preenchidos com 0 (sem garagem). Alta colinearidade — pode ser removida em favor de YearBuilt.
+
+GarageFinish
+Texto com o acabamento interno da garagem: Fin (acabada), RFn (semi-acabada), Unf (sem acabamento), None. Tem ordem lógica. Encoding ordinal: Fin=3, RFn=2, Unf=1, None=0.
+
+GarageCars e GarageArea
+Numéricas com a capacidade em carros e a área em pés quadrados da garagem. Correlação de ~0.63 com o preço. As duas medem essencialmente o mesmo conceito — tamanho da garagem. Alta colinearidade entre si. Para modelos lineares considere manter apenas uma. Para XGBoost e Random Forest pode manter as duas.
+
+GarageQual e GarageCond
+Texto com qualidade e condição da garagem: Ex, Gd, TA, Fa, Po, None. Encoding ordinal. A maioria é TA, então a variância é baixa.
+
+PavedDrive
+Texto com o tipo de entrada: Y (pavimentada), P (parcialmente pavimentada), N (terra/cascalho). Tem ordem lógica. Encoding ordinal: Y=2, P=1, N=0.
+
+WoodDeckSF, OpenPorchSF, EnclosedPorch, 3SsnPorch, ScreenPorch
+Numéricas com as áreas das diferentes áreas externas cobertas. Todas têm alta assimetria por muitos zeros. Foram combinadas na feature total_porch_sf. As individuais são candidatas a log1p ou até remoção dado o alto percentual de zeros.
+
+PoolArea e PoolQC
+PoolArea é numérica com a área da piscina — 99.5% zeros. PoolQC é texto com a qualidade: Ex, Gd, TA, Fa, None — 99.5% None. Ambas têm variância praticamente zero. Candidatas fortes a remoção, ou simplificadas na flag binária has_pool.
+
+Fence
+Texto com a qualidade da cerca: GdPrv (boa privacidade), MnPrv (privacidade mínima), GdWo (boa madeira), MnWw (madeira/arame mínimo), None. 80.1% são None. Sem hierarquia clara entre os tipos de cerca. One-Hot Encoding.
+
+MiscFeature e MiscVal
+MiscFeature é texto com features diversas não cobertas em outras colunas: elevador, quadra de tênis, galpão, 2ª garagem. 96.1% são None. MiscVal é o valor monetário dessas features. Ambas têm variância muito baixa. Candidatas a remoção ou simplificação em flag binária.
+
+MoSold e YrSold
+Numéricas inteiras com mês e ano de venda. Como discutido, são categorias disfarçadas de número — janeiro não é "menor" que dezembro. Convertidas para string e tratadas com One-Hot Encoding. O ano de venda pode capturar efeitos de mercado imobiliário ao longo do tempo.
+
+SaleType
+Texto com o tipo de contrato de venda: escritura convencional (WD, ~80% dos casos), nova construção (New), leilão judicial (COD), contrato particular, etc. Sem hierarquia. One-Hot Encoding.
+
+SaleCondition
+Texto com a condição da venda: Normal, Abnorml (leilão, foreclosure), Partial (construção inacabada), Family (venda entre parentes), etc. Sem hierarquia. One-Hot Encoding. Vale notar que vendas Abnorml e Family tendem a ter preços abaixo do mercado.
+
+SalePrice
+A variável alvo. Como analisado, tem assimetria de +1.74 e deve ser transformada com log1p antes do treino e revertida com expm1 nas predições finais.

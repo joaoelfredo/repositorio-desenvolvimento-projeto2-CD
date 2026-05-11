@@ -1,0 +1,12 @@
+CORRELAÇÃO:
+Eu perceb que preciso pegar algumas colunas que tem código como referência, meses, anos etc que só pq o valor é maior não significa que é melhor. Por exemplo: a coluna MSSubClassCódigos 20, 30, 60... representam tipos de imóvel. e o valor 190 que tem não siginica que merece maios destque.
+
+Pedi para IA listar para mim:
+
+Grupo 1 — Códigos numéricos sem ordem (igual ao MSSubClass)
+ColunaPor quêMSSubClassCódigos 20, 30, 60... representam tipos de imóvelMoSoldMeses 1–12, mas janeiro não é "menor" que dezembroYrSoldAnos específicos, não uma escala contínua
+
+Grupo 2 — Texto sem hierarquia clara
+ColunaExemplos de valoresMSZoningRL, RM, FV, C... (zonas residencial, comercial...)StreetPave, GrvlAlleyPave, Grvl, NoneLotShapeReg, IR1, IR2, IR3LandContourLvl, Bnk, HLS, LowLotConfigInside, Corner, CulDSac...LandSlopeGtl, Mod, SevNeighborhoodNoRidge, CollgCr, OldTown...Condition1Norm, Feedr, Artery...Condition2Norm, Feedr, Artery...BldgType1Fam, Duplx, TwnhsE...HouseStyle1Story, 2Story, SFoyer...RoofStyleGable, Hip, Flat...RoofMatlCompShg, WdShake, Metal...Exterior1stVinylSd, HdBoard, BrkFace...Exterior2ndVinylSd, HdBoard, BrkFace...MasVnrTypeBrkFace, Stone, None...FoundationPConc, CBlock, BrkTil...HeatingGasA, GasW, Grav...CentralAirY, NElectricalSBrkr, FuseA, FuseF...GarageTypeAttchd, Detchd, BuiltIn, None...SaleTypeWD, New, COD...SaleConditionNormal, Abnorml, Partial...FenceGdPrv, MnPrv, GdWo, None...MiscFeatureShed, Gar2, None...
+
+//-----------------------------------------------------------------------------
