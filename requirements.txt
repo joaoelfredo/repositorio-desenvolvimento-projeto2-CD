@@ -1,9 +1,11 @@
 pandas
 numpy
 nbformat
-ipykernel 
+ipykernel
 notebook
 plotly
 matplotlib
 seaborn
 scipy
+scikit-learn
+joblib
